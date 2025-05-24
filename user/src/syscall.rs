@@ -196,8 +196,3 @@ pub fn sys_ls() -> isize {
     syscall(SYSCALL_LS, 0, 0, 0)
 }
 
-// YHW写的系统调用
-use crate::times::*;
-pub fn sys_times(tms_buf:*const Times)->isize{
-    syscall(SYSCALL_TIMES,tms_buf as usize,0,0) //此处有更改
-}
