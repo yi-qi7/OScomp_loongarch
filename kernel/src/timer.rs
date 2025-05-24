@@ -71,3 +71,44 @@ pub fn check_timer() {
         }
     }
 }
+
+
+#[repr(C)]
+pub struct Times{
+    pub utime:isize,
+    pub stime:isize,
+    pub cutime:isize,
+    pub cstime:isize,
+    pub u_start_time:isize,
+    pub s_start_time:isize,
+}
+impl Clone for Times {
+    fn clone(&self) -> Self {
+        Self {
+            utime: self.utime,
+            stime: self.stime,
+            cutime: self.cutime,
+            cstime: self.cstime,
+            u_start_time: self.u_start_time,
+            s_start_time: self.s_start_time,
+        }
+    }
+}
+impl Times{
+    pub fn new()->Times{
+        Times{
+            utime:0,
+            stime:0,
+            cutime:0,
+            cstime:0,
+            u_start_time:get_time_ms() as isize,
+            s_start_time:get_time_ms() as isize,
+        }
+    }
+}
+
+#[repr(C)]
+pub struct Timespec {
+    pub sec:usize,
+    pub usec:usize,
+}
