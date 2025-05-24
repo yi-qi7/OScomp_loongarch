@@ -74,7 +74,7 @@ fn test_memory_write(address: *mut u64) {
 
 #[no_mangle]
 pub fn main(cpu: usize) {
-    println!("Hello, world!{}",cpu);
+    println!("Hello, world!{}");
     println!("{}", FLAG);
     println!("cpu: {}", cpu);
     clear_bss();

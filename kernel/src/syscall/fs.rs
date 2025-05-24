@@ -49,6 +49,7 @@ pub fn sys_read(fd: usize, buf: *const u8, len: usize) -> isize {
         -1
     }
 }
+
 pub fn sys_open(path: *const u8, flags: u32) -> isize {
     let process = current_process();
     let token = current_user_token();

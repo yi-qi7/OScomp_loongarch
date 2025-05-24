@@ -42,6 +42,8 @@ pub struct ProcessControlBlockInner {
     pub mutex_list: Vec<Option<Arc<dyn Mutex>>>,            //互斥锁列表
     pub semaphore_list: Vec<Option<Arc<Semaphore>>>,        //信号量列表
     pub condvar_list: Vec<Option<Arc<Condvar>>>,            //条件变量列表
+    pub times:Times,                                        //YHW
+    pub in_user:bool,                                       //YHW
 }
 
 impl ProcessControlBlockInner {
@@ -69,7 +71,78 @@ impl ProcessControlBlockInner {
     pub fn get_task(&self, tid: usize) -> Arc<TaskControlBlock> {
         self.tasks[tid].as_ref().unwrap().clone()
     }
+
+    //YHW 实现以下函数
+    pub fn update_utime(&mut self)->isize{
+        if self.in_user==true {
+            let curr_time=get_time_ms() as isize;
+            let utime_increment= curr_time-self.times.u_start_time;
+            self.times.utime+=utime_increment;
+            self.times.u_start_time = curr_time;
+            utime_increment
+        }
+        else{
+            0
+        }
+        
+    }
+    pub fn get_utime(&mut self)->isize{
+        self.update_utime();
+        self.times.utime
+    }
+    pub fn restart_utime(&mut self){
+        if self.in_user==false{
+            self.in_user=true;
+            self.times.u_start_time=get_time_ms() as isize;
+        }
+    }
+
+    pub fn update_stime(&mut self)->isize{
+        if self.in_user==false {//in kernel
+            let curr_time=get_time_ms() as isize;
+            let stime_increment = curr_time-self.times.s_start_time;
+            self.times.stime+=stime_increment;
+            self.times.s_start_time=curr_time;
+            stime_increment
+        }
+        else{
+            0
+        }
+    }
+    pub fn get_stime(&mut self) ->isize{
+        self.update_stime();
+        self.times.stime
+    }
+    pub fn restart_stime(&mut self){
+        if self.in_user==true{
+            self.in_user=false;
+            self.times.s_start_time=get_time_ms() as isize;
+        }
+    }
+
+    pub fn get_cutime(&mut self)->isize{
+        if self.children.len()>0 {
+            let mut cutime_temp=0;
+            for child in &mut self.children {
+                cutime_temp+=child.inner_exclusive_access().get_utime();
+            }
+            self.times.cutime=cutime_temp;
+        }
+        self.times.cutime
+    }
+
+    pub fn get_cstime(&mut self)->isize{
+        if self.children.len()>0 {
+            let mut cstime_temp=0;
+            for child in &mut self.children {
+                cstime_temp+=child.inner_exclusive_access().get_stime();
+            }
+            self.times.cstime=cstime_temp;
+        }
+        self.times.cstime
+    }
 }
+
 
 impl ProcessControlBlock {
     pub fn inner_exclusive_access(&self) -> RefMut<'_, ProcessControlBlockInner> {
@@ -104,6 +177,8 @@ impl ProcessControlBlock {
                     mutex_list: Vec::new(),
                     semaphore_list: Vec::new(),
                     condvar_list: Vec::new(),
+                    times:Times::new(),
+                    in_user:true,
                 })
             },
         });
@@ -224,6 +299,8 @@ impl ProcessControlBlock {
                     mutex_list: Vec::new(),
                     semaphore_list: Vec::new(),
                     condvar_list: Vec::new(),
+                    times:Times::new(),
+                    in_user:true,
                 })
             },
         });
