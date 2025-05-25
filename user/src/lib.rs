@@ -11,6 +11,7 @@ mod sync;
 mod syscall;
 mod thread;
 mod time;
+mod times;
 
 use alloc::vec::Vec;
 
@@ -27,6 +28,7 @@ pub use sign::*;
 pub use sync::*;
 pub use thread::*;
 pub use time::*;
+pub use times::*;
 
 const USER_HEAP_SIZE: usize = 0x4000;
 static mut HEAP_SPACE: [u8; USER_HEAP_SIZE] = [0; USER_HEAP_SIZE];
