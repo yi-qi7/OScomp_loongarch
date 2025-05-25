@@ -24,7 +24,7 @@
 - [ ] chroot
 - [ ] socket
 - [ ] bind
-- [ ] listen
+- [ ] listen  这个v3有实现，考虑将v3的实现迁移过来
 - [ ] sendto
 - [ ] stat
 - [ ] ioctl
