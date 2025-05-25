@@ -57,6 +57,7 @@ use process::*;
 use signal::*;
 use sync::*;
 use thread::*;
+use crate::timer::Times;
 
 /// handle syscall exception with `syscall_id` and other arguments
 pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
