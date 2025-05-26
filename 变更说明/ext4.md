@@ -7,3 +7,5 @@
 在根目录创建img文件
 
 修改Makefile文件
+
+修改kernel/Cargo.toml文件
