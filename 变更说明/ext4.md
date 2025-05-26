@@ -31,3 +31,5 @@ pub use mutex::{Mutex, MutexBlocking, MutexSpin};
 pub use semaphore::Semaphore;
 pub use up::{UPSafeCell, UPIntrFreeCell, UPIntrRefMut}; // 修改此处
 ```
+
+在kernel/src/sync/up.rs中定义结构体
