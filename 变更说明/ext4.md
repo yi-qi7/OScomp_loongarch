@@ -20,7 +20,7 @@ os/src/drivers/block/virtio_blk.rs -> kernel/src/loongarch/driver/ahci.rs代码�
 
 ## 引入UPIntrFreeCell
 修改kernel/src/sync/mod.rs
-'''rust
+```rust
 mod condvar;
 mod mutex;
 mod semaphore;
@@ -30,4 +30,4 @@ pub use condvar::Condvar;
 pub use mutex::{Mutex, MutexBlocking, MutexSpin};
 pub use semaphore::Semaphore;
 pub use up::{UPSafeCell, UPIntrFreeCell, UPIntrRefMut}; // 修改此处
-'''
+```
