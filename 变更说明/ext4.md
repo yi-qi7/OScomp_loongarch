@@ -10,7 +10,7 @@
 
 修改kernel/Cargo.toml文件
 
-os/src/fs/inode.rs -> 
+os/src/fs/inode.rs -> kernel/src/fs/inode.rs
 
 os/src/drivers/block/mod.rs -> kernel/src/loongarch/driver/mod.rs代码更改
 
