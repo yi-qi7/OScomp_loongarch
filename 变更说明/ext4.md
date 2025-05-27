@@ -18,7 +18,11 @@ os/src/fs/inode.rs -> kernel/src/fs/inode.rs
 
 os/src/drivers/block/mod.rs -> kernel/src/loongarch/driver/mod.rs代码更改
 
-os/src/drivers/block/virtio_blk.rs -> kernel/src/loongarch/driver/ahci.rs代码更改。
+os/src/drivers/block/virtio_blk.rs -> kernel/src/loongarch/driver/ahci.rs代码更改
+
+ext4_rs/src/ext4_defs/block.rs添加代码
+
+isomorphic_drivers/src/block/ahci.rs添加代码
 
 ## 详细更改
 仅记录与ext4不同的地方
