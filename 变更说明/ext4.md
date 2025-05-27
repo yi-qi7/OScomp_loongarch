@@ -63,6 +63,8 @@ pub fn ls(&self) -> Vec<String> {
 
 这里为了简便直接返回空列表，这仅会影响桌面显示文件图标的功能，不会对其他造成影响
 
+将所有UPIntrFreeCell改为PSafeCell，这是因为龙芯中未实现UPIntrFreeCell，曾尝试在kernel/src/sync/up.rs中添加上UPIntrFreeCell，具体的添加过程在最后的废案中，但添加完成后发现出现更多报错，需要迁移更改更多文件，所以暂时使用龙芯之前使用的PSafeCell
+
 ### kernel/src/loongarch/driver/mod.rs
 使用ahci协议
 ```rust
