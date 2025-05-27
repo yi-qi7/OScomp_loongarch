@@ -44,12 +44,16 @@ ifeq ($(BOARD),qemu)
 endif
 ```
 
+---
+
 ### kernel/Cargo.toml
 不使用virtio-blk-device设备而是使用STATA硬盘模拟，并添加了Ahci协议。
 ```rust
 isomorphic_drivers = { path = "../isomorphic_drivers" } #使用
 #virtio-drivers = { path = "../virtio-drivers" }  不使用virtio-drivers
 ```
+
+---
 
 ### kernel/src/fs/inode.rs
 龙芯gui中实现了Inode下的一个函数用于获取根目录下的文件列表，并在桌面上显示文件图标。risc无这个函数，将代码替换为ext4适配的时候需加上这个函数，不然编译报错
@@ -64,6 +68,8 @@ pub fn ls(&self) -> Vec<String> {
 这里为了简便直接返回空列表，这仅会影响桌面显示文件图标的功能，不会对其他造成影响
 
 将所有UPIntrFreeCell改为PSafeCell，这是因为龙芯中未实现UPIntrFreeCell，曾尝试在kernel/src/sync/up.rs中添加上UPIntrFreeCell，具体的添加过程在最后的废案中，但添加完成后发现出现更多报错，需要迁移更改更多文件，所以暂时使用龙芯之前使用的PSafeCell
+
+---
 
 ### kernel/src/loongarch/driver/mod.rs
 使用ahci协议
