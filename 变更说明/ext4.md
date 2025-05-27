@@ -152,8 +152,23 @@ impl BlockDevice for AHCIDriver {
     }
 }
 ```
+由于加入了read_block和write_block，所以要在ext4_rs/src/ext4_defs/block.rs中关于BlockDevice的trait加上这两个函数，具体更改见后面
 
 ---
+### ext4_rs/src/ext4_defs/block.rs
+在trait中加入read_block和write_block
+```rust
+pub trait BlockDevice: Send + Sync + Any {
+    fn read_offset(&self, offset: usize) -> Vec<u8>; 
+    fn write_offset(&self, offset: usize, data: &[u8]); 
+    fn handle_irq(&self);
+    ///Read data form block to buffer
+    fn read_block(&self, block_id: usize, buf: &mut [u8]); //ext4
+    ///Write data from buffer to block
+    fn write_block(&self, block_id: usize, buf: &[u8]); //ext4
+}
+```
+
 
 ### 引入UPIntrFreeCell(废案，出现更多报错)
 修改kernel/src/sync/mod.rs
