@@ -51,6 +51,20 @@ isomorphic_drivers = { path = "../isomorphic_drivers" } #使用
 #virtio-drivers = { path = "../virtio-drivers" }  不使用virtio-drivers
 ```
 
+### kernel/src/fs/inode.rs
+龙芯gui中实现了Inode下的一个函数用于获取根目录下的文件列表，并在桌面上显示文件图标。risc无这个函数，将代码替换为ext4适配的时候需加上这个函数，不然编译报错
+```rust
+pub fn ls(&self) -> Vec<String> {
+	// 具体实现在sasy-fs/src/vfs.rs中，但迁移有问题
+	vec![] // 返回空列表
+}
+```
+该函数具体实现参考sasy-fs/src/vfs.rs，但如果将该函数迁移过来，又会涉及到更多东西，需要把更多东西一起迁移过来……
+
+这里为了简便直接返回空列表，这仅会影响桌面显示文件图标的功能，不会对其他造成影响
+
+### kernel/src/loongarch/driver/mod.rs
+
 
 ### 引入UPIntrFreeCell(废案，出现更多报错)
 修改kernel/src/sync/mod.rs
