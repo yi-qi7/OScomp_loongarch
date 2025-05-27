@@ -64,7 +64,32 @@ pub fn ls(&self) -> Vec<String> {
 这里为了简便直接返回空列表，这仅会影响桌面显示文件图标的功能，不会对其他造成影响
 
 ### kernel/src/loongarch/driver/mod.rs
+使用ahci协议
+```rust
+mod ahci;
+pub mod pci;
+```
 
+保留原代码对BLOCK_DEVICE的处理
+```rust
+//ext4原代码
+/*lazy_static! {
+    pub static ref BLOCK_DEVICE: Arc<dyn BlockDevice> = Arc::new(BlockDeviceImpl::new());
+}*/
+
+//改为下面
+/// Used only for initialization hacks.
+pub const DUMMY_BLOCK_DEVICE: *const dyn BlockDevice =
+    unsafe { transmute(&0 as *const _ as *const ahci::AHCIDriver as *const dyn BlockDevice) };
+
+pub static BLOCK_DEVICE: Cell<Arc<dyn BlockDevice>> = unsafe { transmute(DUMMY_BLOCK_DEVICE) };
+
+pub fn ahci_init() {
+    unsafe {
+        (BLOCK_DEVICE.get() as *mut Arc<dyn BlockDevice>).write(Arc::new(pci_init().unwrap()));
+    }
+}
+```
 
 ### 引入UPIntrFreeCell(废案，出现更多报错)
 修改kernel/src/sync/mod.rs
