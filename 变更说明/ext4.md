@@ -152,7 +152,7 @@ impl BlockDevice for AHCIDriver {
     }
 }
 ```
-由于加入了read_block和write_block，所以要在ext4_rs/src/ext4_defs/block.rs中关于BlockDevice的trait加上这两个函数，具体更改见后面
+由于加入了read_block和write_block，所以要在ext4_rs/src/ext4_defs/block.rs中关于BlockDevice的trait加上这两个函数，具体更改见[后面](https://github.com/yi-qi7/OScomp_loongarch/blob/main/%E5%8F%98%E6%9B%B4%E8%AF%B4%E6%98%8E/ext4.md#ext4_rssrcext4_defsblockrs)
 
 ---
 ### ext4_rs/src/ext4_defs/block.rs
