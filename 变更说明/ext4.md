@@ -52,7 +52,7 @@ isomorphic_drivers = { path = "../isomorphic_drivers" } #使用
 ```
 
 
-### 引入UPIntrFreeCell
+### 引入UPIntrFreeCell(废案，出现更多报错)
 修改kernel/src/sync/mod.rs
 ```rust
 mod condvar;
