@@ -24,6 +24,12 @@ os/src/drivers/block/virtio_blk.rs -> kernel/src/loongarch/driver/ahci.rs代码�
 仅记录与ext4不同的地方
 
 ### Makefile
+由于文件结构不同，Makefile下的img路径有更改
+```rust
+#文件模拟块设备
+# FS_IMG := ./target/$(TARGET)/$(MODE)/fs.img #ext4
+FS_IMG := ./img/ex4.img #ext4 由于makefile位置要改为在当前文件夹下
+```
 不使用virtio-blk-device设备而是使用STATA硬盘模拟，并添加了Ahci协议。
 ```rust
 ifeq ($(BOARD),qemu)
