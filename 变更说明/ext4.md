@@ -91,6 +91,70 @@ pub fn ahci_init() {
 }
 ```
 
+---
+
+### kernel/src/loongarch/driver/ahci.rs
+**该文件下有大量更改**
+
+ext4给了BLOCK_SIZE，所以将isomorphic_drivers内的BLOCK_SIZE删去，否则二次定义
+```rust
+use isomorphic_drivers::{
+    block::ahci::{AHCI}, //更改
+    provider,
+};
+```
+
+采用原来实现的read_block和write_block，引入read_offset和write_offset，从头写一个中断handle_irq
+```rust
+impl BlockDevice for AHCIDriver {
+    fn read_block(&self, block_id: usize, buf: &mut [u8]) {
+        self.0.exclusive_access().read_block(block_id, buf);
+    }
+
+    fn write_block(&self, block_id: usize, buf: &[u8]) {
+        assert!(buf.len() >= BLOCK_SIZE);
+        self.0.exclusive_access().write_block(block_id, buf);
+    }
+
+    fn read_offset(&self, offset: usize) -> Vec<u8> {
+        let block_id = offset / DEVICE_BLOCK_SIZE;
+        let mut result_buf = vec![0u8; BLOCK_SIZE];
+        let inner_offset = offset % DEVICE_BLOCK_SIZE;
+        if inner_offset == 0 {
+            self.read_block(block_id, &mut result_buf);
+        } else {
+            let mut temp_buf = vec![0u8; BLOCK_SIZE + DEVICE_BLOCK_SIZE];
+            self.read_block(block_id, &mut temp_buf);
+            result_buf[..BLOCK_SIZE].copy_from_slice(
+                &temp_buf[inner_offset..inner_offset + BLOCK_SIZE],);
+        }
+        // println!("result_buf: {:x}", result_buf.as_ptr() as usize);
+        result_buf
+    }
+
+    fn write_offset(&self, offset: usize, data: &[u8]) {
+        let start_block_id = offset / DEVICE_BLOCK_SIZE;
+        let write_len = data.len();
+        let end_block_id = (offset + write_len - 1) / DEVICE_BLOCK_SIZE;
+        let fit_len = (end_block_id - start_block_id + 1) * DEVICE_BLOCK_SIZE;
+        let mut temp_buf = vec![0u8; fit_len];
+        // println!("write_offset: start_block_id: {}, write_len: {}, offset: {}, data_addr: {:x}, fit_len: {}, temp buf len {}", start_block_id, write_len, offset, data.as_ptr() as usize, fit_len, temp_buf.len());
+        self.read_block(start_block_id, &mut temp_buf);
+        // println!("write_offset: start_block_id: {}, write_len: {}, offset: {}, data_addr: {:x}, fit_len: {}", start_block_id, write_len, offset, data.as_ptr() as usize, fit_len);
+        temp_buf[offset % DEVICE_BLOCK_SIZE..offset % DEVICE_BLOCK_SIZE + write_len].copy_from_slice(&data);
+        
+        self.write_block(start_block_id, &temp_buf);
+        
+    }
+
+    fn handle_irq(&self) {
+        self.0.exclusive_access().handle_interrupt();
+    }
+}
+```
+
+---
+
 ### 引入UPIntrFreeCell(废案，出现更多报错)
 修改kernel/src/sync/mod.rs
 ```rust
