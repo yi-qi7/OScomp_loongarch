@@ -38,6 +38,13 @@ ifeq ($(BOARD),qemu)
 endif
 ```
 
+### kernel/Cargo.toml
+不使用virtio-blk-device设备而是使用STATA硬盘模拟，并添加了Ahci协议。
+```rust
+isomorphic_drivers = { path = "../isomorphic_drivers" } #使用
+#virtio-drivers = { path = "../virtio-drivers" }  不使用virtio-drivers
+```
+
 
 ### 引入UPIntrFreeCell
 修改kernel/src/sync/mod.rs
