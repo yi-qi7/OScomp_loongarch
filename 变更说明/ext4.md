@@ -104,7 +104,7 @@ use isomorphic_drivers::{
 };
 ```
 
-采用原来实现的read_block和write_block，引入read_offset和write_offset，从头写一个中断handle_irq
+采用原来实现的read_block和write_block，引入与ext4有关的read_offset和write_offset，从头写一个中断handle_irq
 ```rust
 impl BlockDevice for AHCIDriver {
     fn read_block(&self, block_id: usize, buf: &mut [u8]) {
