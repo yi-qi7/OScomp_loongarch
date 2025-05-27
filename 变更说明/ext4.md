@@ -67,7 +67,12 @@ pub fn ls(&self) -> Vec<String> {
 
 这里为了简便直接返回空列表，这仅会影响桌面显示文件图标的功能，不会对其他造成影响
 
-将所有UPIntrFreeCell改为PSafeCell，这是因为龙芯中未实现UPIntrFreeCell，曾尝试在kernel/src/sync/up.rs中添加上UPIntrFreeCell，具体的添加过程在最后的废案中，但添加完成后发现出现更多报错，需要迁移更改更多文件，所以暂时使用龙芯之前使用的PSafeCell
+将所有UPIntrFreeCell改为PSafeCell，这是因为龙芯中未实现UPIntrFreeCell，曾尝试在kernel/src/sync/up.rs中添加上UPIntrFreeCell，具体的添加过程在[最后的废案中](https://github.com/yi-qi7/OScomp_loongarch/blob/main/%E5%8F%98%E6%9B%B4%E8%AF%B4%E6%98%8E/ext4.md#%E5%BC%95%E5%85%A5upintrfreecell%E5%BA%9F%E6%A1%88%E5%87%BA%E7%8E%B0%E6%9B%B4%E5%A4%9A%E6%8A%A5%E9%94%99)，但添加完成后发现出现更多报错，需要迁移更改更多文件，所以暂时使用龙芯之前使用的PSafeCell
+
+所以不用加上
+```rust
+use crate::sync::UPIntrFreeCell;
+```
 
 ---
 
