@@ -154,7 +154,58 @@ impl BlockDevice for AHCIDriver {
 ```
 由于加入了read_block和write_block，所以要在ext4_rs/src/ext4_defs/block.rs中关于BlockDevice的trait加上这两个函数，具体更改见[后面](https://github.com/yi-qi7/OScomp_loongarch/blob/main/%E5%8F%98%E6%9B%B4%E8%AF%B4%E6%98%8E/ext4.md#ext4_rssrcext4_defsblockrs)
 
-在isomorphic_drivers/src/block/ahci.rs实现了handle_interrupt中断，详见后面
+在isomorphic_drivers/src/block/ahci.rs实现了handle_interrupt中断，详见[后面](https://github.com/yi-qi7/OScomp_loongarch/blob/main/%E5%8F%98%E6%9B%B4%E8%AF%B4%E6%98%8E/ext4.md#isomorphic_driverssrcblockahcirs)
+
+除此之外，保留原本的AHCIDriver的结构体形式和new()
+```rust
+pub struct AHCIDriver(UPSafeCell<AHCI<Provider>>);
+
+impl AHCIDriver {
+    pub fn new(header: usize, size: usize) -> Option<Self> {
+        unsafe { AHCI::new(header, size).map(|x| Self(UPSafeCell::new(x))) }
+    }
+}
+```
+
+根据[龙芯手册](https://godones.github.io/rCoreloongArch/stat.html)我们还需要保留硬盘的读取相应的接口
+```rust
+impl provider::Provider for Provider {
+    const PAGE_SIZE: usize = PAGE_SIZE;
+    fn alloc_dma(size: usize) -> (usize, usize) {
+        let pages = size / PAGE_SIZE;
+        let mut phy_base = 0;
+        for i in 0..pages {
+            let frame = frame_alloc().unwrap();
+            let frame_pa: PhysAddr = frame.ppn.into();
+            let frame_pa = frame_pa.into();
+            core::mem::forget(frame);
+            if i == 0 {
+                phy_base = frame_pa;
+            }
+            assert_eq!(frame_pa, phy_base + i * PAGE_SIZE);
+        }
+        let base_page: usize = phy_base / PAGE_SIZE;
+        let virt_base = phys_to_virt!(phy_base);
+        println!(
+            "virtio_dma_alloc: phy_addr: ({:#x}-{:#x})",
+            phy_base,
+            phy_base + size
+        );
+        (virt_base, phy_base)
+    }
+
+    fn dealloc_dma(va: usize, size: usize) {
+        println!("dealloc_dma: virt_addr: ({:#x}-{:#x})", va, va + size);
+        let mut pa = virt_to_phys!(va);
+        let pages = size / PAGE_SIZE;
+        for _ in 0..pages {
+            frame_dealloc(PhysAddr::from(pa).into());
+            pa += PAGE_SIZE;
+        }
+    }
+}
+```
+
 
 ---
 ### ext4_rs/src/ext4_defs/block.rs
