@@ -4,7 +4,7 @@
 
 ## 更改的文件
 
-靖宇还在更新文件系统内的代码，此处先复制浩文库内的ext4_rs文件到根目录
+复制ext4_rs文件到根目录
 
 复制virtio-drivers到根目录
 
@@ -20,7 +20,26 @@ os/src/drivers/block/mod.rs -> kernel/src/loongarch/driver/mod.rs代码更改
 
 os/src/drivers/block/virtio_blk.rs -> kernel/src/loongarch/driver/ahci.rs代码更改。同时把ahci文件改名为virtio_blk
 
-## 引入UPIntrFreeCell
+## 详细更改
+仅记录与ext4不同的地方
+
+### Makefile
+不使用virtio-blk-device设备而是使用STATA硬盘模拟，并添加了Ahci协议。
+```rust
+ifeq ($(BOARD),qemu)
+	qemu-system-loongarch64 \
+		-m 1G \
+		-smp 1 \
+		-kernel $(KERNEL_ELF) \
+		$(VGA) \
+		-drive file=$(FS_IMG),if=none,format=raw,id=x0 \
+		-device ahci,id=ahci0 \  #延用ahci协议，此处不变
+		-device ide-hd,drive=x0,bus=ahci0.0  
+endif
+```
+
+
+### 引入UPIntrFreeCell
 修改kernel/src/sync/mod.rs
 ```rust
 mod condvar;
