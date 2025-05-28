@@ -103,16 +103,19 @@ pub fn main(cpu: usize) {
     trap::init();
     print_machine_info();
     println!("machine info success");
+    
     // sata硬盘
     ahci_init();
     println!("ahci init success");
     //运行程序
-
+    
     if cfg!(feature = "gui") {
         vbe_test();
     }
 
+    log::error!("ahci init success");
     enable_timer_interrupt();
+    
 
     // list_apps(); //列出所有程序
     add_initproc(); //添加初始化程序

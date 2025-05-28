@@ -153,7 +153,9 @@ lazy_static! {
 }
 
 pub fn add_initproc() {
+    println!("zsq");
     let _initproc = INITPROC.clone();
+    println!("zsq");
 }
 
 pub fn check_signals_of_current() -> Option<(i32, &'static str)> {

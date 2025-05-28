@@ -13,7 +13,10 @@ use core::{
 };
 
 pub use ahci::AHCIDriver;
-use easy_fs::BlockDevice;
+//ext4
+//use easy_fs::BlockDevice;
+use ext4_rs::BlockDevice; //ext4
+
 use log::info;
 pub use pckbd::{i8042_init, kbd_has_data, kbd_read_scancode};
 

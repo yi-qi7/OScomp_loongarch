@@ -11,9 +11,9 @@ pub const FLAG: &str = "
 ";
 pub const UART: usize = 0x1FE001E0 + VIRT_BIAS;
 pub const USER_STACK_SIZE: usize = PAGE_SIZE; //用户栈大小
-                                              // pub const KERNEL_STACK_SIZE: usize = PAGE_SIZE; //内核栈大小
+pub const KERNEL_STACK_SIZE: usize = PAGE_SIZE; //内核栈大小
 
-pub const KERNEL_HEAP_SIZE: usize = 0x1E0_0000; //内核的可分配堆大小3MB
+pub const KERNEL_HEAP_SIZE: usize = 0x800_000; //内核的可分配堆大小3MB  改为32MB
 
 pub const TICKS_PER_SEC: usize = 100;
 pub const MSEC_PER_SEC: usize = 1000;
