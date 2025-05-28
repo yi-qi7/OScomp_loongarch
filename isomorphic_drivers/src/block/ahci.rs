@@ -426,6 +426,7 @@ impl<P: Provider> AHCI<P> {
             // );
 
             let data = unsafe { slice::from_raw_parts_mut(data_va as *mut u8, BLOCK_SIZE) };
+            // let data = unsafe { slice::from_raw_parts_mut(data_va as *mut u8, 4096) };
 
             Some(AHCI {
                 header,
@@ -461,8 +462,11 @@ impl<P: Provider> AHCI<P> {
         self.port.issue_command(0);
         self.port.spin_on_slot(0);
 
-        let len = buf.len().min(BLOCK_SIZE);
+        // let len = buf.len().min(BLOCK_SIZE); //ext4
+        let len = buf.len();
+        log::error!("buf len {:?}", len);
         buf[..len].clone_from_slice(&self.data[0..len]);
+        //log::error!("content : {:?}",buf);
         len
     }
 
@@ -470,7 +474,8 @@ impl<P: Provider> AHCI<P> {
         // cfl=4
         self.cmd_list[0].flags = 4 | CommandHeaderFlags::WRITE.bits(); // device write
 
-        let len = buf.len().min(BLOCK_SIZE);
+        // let len = buf.len().min(BLOCK_SIZE);  //ext4
+        let len = buf.len();
         self.data[0..len].clone_from_slice(&buf[..len]);
 
         let fis = &mut self.cmd_table.cfis;
@@ -501,7 +506,7 @@ impl<P: Provider> Drop for AHCI<P> {
     }
 }
 
-pub const BLOCK_SIZE: usize = 512;
+pub const BLOCK_SIZE: usize = 4096;
 
 fn from_ata_string(data: &[u8]) -> String {
     let mut swapped_data = Vec::new();
@@ -511,4 +516,61 @@ fn from_ata_string(data: &[u8]) -> String {
         swapped_data.push(data[i]);
     }
     return String::from_utf8(swapped_data).unwrap();
+}
+
+
+//下面都是ext4
+impl<P: Provider> AHCI<P> {
+    /// 处理 AHCI 中断
+    pub fn handle_interrupt(&mut self) {
+        // 读取全局中断状态
+        let global_is = self.ghc.interrupt_status.read();
+        
+        // 检查是否有端口中断
+        if global_is != 0 {
+            // 清除全局中断标志
+            self.ghc.interrupt_status.write(global_is);
+            
+            // 处理每个端口的中断
+            for port_num in 0..self.ghc.num_ports() {
+                if !self.ghc.has_port(port_num) {
+                    continue;
+                }
+                
+                let port = unsafe { &mut *self.ghc.port_ptr(port_num) };
+                self.handle_port_interrupt(port);
+            }
+        }
+    }
+    
+    /// 处理单个端口的中断
+    fn handle_port_interrupt(&mut self, port: &mut AHCIPort) {
+        // 读取端口中断状态
+        let port_is = port.interrupt_status.read();
+        
+        // 检查是否有命令完成中断
+        if port_is & (1 << 31) != 0 {
+            // 清除端口中断标志
+            port.interrupt_status.write(1 << 31);
+            
+            // 处理完成的命令槽
+            for slot in 0..32 {
+                if (port_is & (1 << slot)) != 0 {
+                    self.process_completed_command(port, slot);
+                }
+            }
+        }
+    }
+    
+    /// 处理完成的命令
+    fn process_completed_command(&mut self, port: &mut AHCIPort, slot: usize) {
+        // 检查命令是否完成
+        if port.command_issue.read() & (1 << slot) == 0 {
+            // 命令已完成，这里可以添加回调或通知机制
+            debug!("AHCI command slot {} completed", slot);
+            
+            // 清除命令槽的中断标志
+            port.interrupt_status.write(1 << slot);
+        }
+    }
 }
