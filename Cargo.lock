@@ -129,6 +129,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ext4_rs"
+version = "1.3.1"
+dependencies = [
+ "bitflags 2.9.1",
+ "log",
+]
+
+[[package]]
 name = "float-cmp"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -191,7 +199,7 @@ dependencies = [
  "bit_field",
  "bitflags 1.3.2",
  "buddy_system_allocator",
- "easy-fs",
+ "ext4_rs",
  "isomorphic_drivers",
  "lazy_static",
  "log",
