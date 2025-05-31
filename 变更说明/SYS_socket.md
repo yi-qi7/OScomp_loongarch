@@ -154,6 +154,82 @@ fn create_udp_socket() -> isize {
 UDP 不需要全局状态表，直接将实例关联到文件描述符表（fd_table）即可，每个 FD 对应独立的 UDP 节点，减少了数据结构开销，不需要通过socket管理
 
 ---
+os/src/net/port_table.rs
+单独测试socket时索引是无效状态，drop会引起panic，所以更新drop处理无效索引的情况
+
+```rust
+/*impl Drop for PortFd {
+    fn drop(&mut self) {
+        LISTEN_TABLE.exclusive_access()[self.0] = None
+    }
+}*/
+//应对无效索引的情况
+impl Drop for PortFd {
+    fn drop(&mut self) {
+        let mut listen_table = LISTEN_TABLE.exclusive_access();
+        
+        // 检查索引是否有效
+        if self.0 >= listen_table.len() {
+            
+            return;
+        }
+        
+        // 安全地设置为 None
+        listen_table[self.0] = None;
+    }
+}
+```
+
+---
+user/src/bin/net_src/bin/net_socket_test.rs
+
+测试代码为
+
+```rust
+#![no_std]
+#![no_main]
+
+use alloc::string::String;
+
+#[macro_use]
+extern crate user_lib;
+#[macro_use]
+extern crate alloc;
+
+// 定义网络常量
+const AF_INET: u32 = 2;
+const SOCK_STREAM: u32 = 1;
+const SOCK_DGRAM: u32 = 2;
+const IPPROTO_TCP: u32 = 6;
+const IPPROTO_UDP: u32 = 17;
+
+use user_lib::{socket, println};
+
+#[unsafe(no_mangle)]
+fn main() -> i32 {
+    println!("begin sys_socket test...");
+    
+    // 测试创建 TCP 套接字
+    let tcp_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if tcp_fd >= 0 {
+        println!("TCP success wonderful!: {}", tcp_fd);
+    } else {
+        println!("TCP failed on no: {}", tcp_fd);
+    }
+    
+    // 测试创建 UDP 套接字
+    let udp_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if udp_fd >= 0 {
+        println!("UDP success wonderful!: {}", udp_fd);
+    } else {
+        println!("UDP failed on no: {}", udp_fd);
+    }
+    
+    println!("socket end");
+
+    0
+}
+```
 
 ## 参考
 
