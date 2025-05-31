@@ -40,5 +40,21 @@ pub fn sys_socket(domain: u32, typ: u32, protocol: u32) -> isize{}
 - domain：即协议域，又称为协议族（family）。常用的协议族有，AF_INET、AF_INET6、AF_LOCAL（或称AF_UNIX，Unix域socket）、AF_ROUTE等等。协议族决定了socket的地址类型，在通信中必须采用对应的地址，如AF_INET决定了要用ipv4地址（32位的）与端口号（16位的）的组合、AF_UNIX决定了要用一个绝对路径名作为地址。在这里，我们的协议族选择使用AF_INET
 - type：指定socket类型。常用的socket类型有，SOCK_STREAM、SOCK_DGRAM、SOCK_RAW、SOCK_PACKET、SOCK_SEQPACKET等等。我们选择使用的有SOCK_STREAM和SOCK_DGRAM，分别对应TCP和UDP协议
 - protocol：顾名思义，就是指定协议。常用的协议有，IPPROTO_TCP、IPPTOTO_UDP、IPPROTO_SCTP、IPPROTO_TIPC等，它们分别对应TCP传输协议、UDP传输协议、STCP传输协议、TIPC传输协议。我们选择使用的有IPPROTO_TCP和IPPROTO_UDP
+定义
+```rust
+// 地址族
+pub const AF_INET: u32 = 2;
+// Socket类型
+pub const SOCK_STREAM: u32 = 1; // TCP
+pub const SOCK_DGRAM: u32 = 2;  // UDP
+// 协议
+pub const IPPROTO_TCP: u32 = 6;
+pub const IPPROTO_UDP: u32 = 17;
+```
+当我们调用socket创建一个socket时，成功会返回文件描述符，失败返回-1
+
+## 参考
+
+https://zhuanlan.zhihu.com/p/100151937
 
 
