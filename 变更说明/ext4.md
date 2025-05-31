@@ -2,7 +2,7 @@
 
 **所有更改均伴随“ext4”的注释**
 
-现在的问题是陷入ext4_rs/src/ext4_impls/dir.rs下的死循环
+现在的问题是陷入ext4_rs/src/ext4_impls/dir.rs下dir_find_in_block的while陷入死循环
 
 ## 更改的文件
 
