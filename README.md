@@ -23,7 +23,7 @@
 - [ ] setegid
 - [ ] seteuid
 - [ ] chroot
-- [ ] socket
+- [x] socket 测试通过
 - [ ] bind
 - [ ] listen  这个v3有实现，考虑将v3的实现迁移过来
 - [ ] sendto
