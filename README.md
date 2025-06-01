@@ -9,14 +9,13 @@
 - [ ] getuid
 - [ ] fstat
 - [ ] fcntl
-- [ ] rename
-- [ ] uname
+- [x] rename
+- [x] uname
 - [ ] mmap
 - [ ] geteuid
 - [ ] ulink
-- [ ] rename
 - [ ] dup2
-- [ ] dup3
+- [x] dup3
 - [ ] lseek
 - [ ] setgid
 - [ ] setuid
