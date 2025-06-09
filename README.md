@@ -1,5 +1,5 @@
 # rCore的龙芯平台移植
-[rCore仓库](https://github.com/YusanXY/OScomp/tree/dev_yiqi)
+[rCore仓库](https://github.com/YusanXY/OScomp/tree/dev_yiqi7)
 
 有关系统调用的迁移与实现位于[变更说明](/变更说明)
 
